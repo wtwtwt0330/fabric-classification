@@ -30,7 +30,7 @@ def report_metrics(metrics):
     return report
 
 
-def evaluate(model, criterion, dataloader, device):
+def evaluate(model, dataloader, device):
     model.eval()
 
     probas = []
@@ -59,7 +59,7 @@ def evaluate(model, criterion, dataloader, device):
         "accuracy": accuracy_score(labels, probas.argmax(1)),
         "AUC": roc_auc_score(labels, probas[:, 1])
     }
-    return probas, labels, metrics
+    return metrics
 
 
 def train_one_epoch(model, criterion, optimizer, dataloader, device):
@@ -87,8 +87,8 @@ def train(model, train_dl, valid_dl, criterion, optimizer, n_epochs, device,
     for epoch in tqdm(range(n_epochs)):
         train_one_epoch(model, criterion, optimizer, train_dl, device)
 
-        _, _, train_metrics = evaluate(model, criterion, train_dl, device)
-        _, _, valid_metrics = evaluate(model, criterion, valid_dl, device)
+        train_metrics = evaluate(model, train_dl, device)
+        valid_metrics = evaluate(model, valid_dl, device)
 
         print("- Train metrics", report_metrics(train_metrics))
         print("- Valid metrics", report_metrics(valid_metrics))
