@@ -10,7 +10,7 @@ class XuelangDataset(Dataset):
     def __init__(self, csv_path):
         df = pd.read_csv(csv_path)
         self.im_paths = df["filename"]
-        self.labels = df["defect_code"]
+        self.labels = df["is_defect"]
 
     def __len__(self):
         return len(self.im_paths)
@@ -39,9 +39,7 @@ class TransformDataset(Dataset):
 
 
 def get_image_transform(size=224, do_aug=True):
-    _trans = []
-    if size:
-        _trans.append(transforms.Resize(size))
+    _trans = [transforms.Resize(size)]
     if do_aug:
         _trans.append(transforms.RandomHorizontalFlip())
         _trans.append(transforms.RandomVerticalFlip())
@@ -76,7 +74,7 @@ def fetch_dataloader(csv_dir, im_size, batch_size, num_workers=1):
 
 
 if __name__ == "__main__":
-    dls = fetch_dataloader("../data", 224, 4)
+    dls = fetch_dataloader("data/round1", 224, 4)
     x, y = next(iter(dls[0]))
     print(x.shape, y)
     print([len(dl.dataset) for dl in dls])

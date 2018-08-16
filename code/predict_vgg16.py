@@ -2,19 +2,18 @@ import argparse
 import random
 import pandas as pd
 from pathlib import Path
-import numpy as np
 
 import torch
 from torch.utils.data import DataLoader
 
 from data_loader import XuelangDataset, TransformDataset, get_image_transform
 from model import VGGClassifier
-from utils import evaluate, set_random_seed, pd_entry_gen
+from utils import evaluate, set_random_seed
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "--data_path",
-    default="../data/test_a.csv",
+    default="../data/test_b.csv",
     type=Path,
     help="Path of test data")
 parser.add_argument(
@@ -31,7 +30,7 @@ def main():
     set_random_seed(args.seed)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    model = VGGClassifier(n_class=11,freeze_features=False)
+    model = VGGClassifier()
     model.load_state_dict(torch.load(args.model_dir / "best.pth"))
     model.to(device)
 
@@ -54,27 +53,23 @@ def main():
     preds = []
     # evaluate on test set
     pred, _, _ = evaluate(model, torch.nn.CrossEntropyLoss(), test_dl, device)
-    entry_probas, entry_fns =  pd_entry_gen(pred, test_dl)
-    preds.append(entry_probas)
-
+    preds.append(pred)
     # evaluate on test set with augmentation
     for _ in range(4):
         pred, _, _ = evaluate(model, torch.nn.CrossEntropyLoss(), test_aug_dl,
                               device)
-        entry_probas, entry_fns =  pd_entry_gen(pred, test_aug_dl)
-        preds.append(entry_probas)
+        preds.append(pred)
 
-    entry_probas_l = np.array(preds)
-    avr_probas_entry = np.mean(entry_probas_l,axis=0)
-
+    pred = sum(preds) / 5
     df = pd.DataFrame(
         {
-            "filename|defect": entry_fns,
-            "probability": avr_probas_entry,
+            "filename":
+            [Path(p).parts[-1] for p in test_dl.dataset._dataset.im_paths],
+            "probability":
+            pred[:, 1]
         },
-        columns=["filename|defect", "probability"])
+        columns=["filename", "probability"])
     df.to_csv(args.model_dir / "submission.csv", index=False)
-    print("submission.csv generated!!!")
 
 
 if __name__ == "__main__":

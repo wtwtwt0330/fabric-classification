@@ -18,8 +18,7 @@ class Flatten(nn.Module):
 class ResNetClassifier(nn.Module):
     def __init__(self, n_class=2, pretrained=True, freeze_features=True):
         super(ResNetClassifier, self).__init__()
-        # original_model = models.resnet34(pretrained=pretrained)
-        original_model = models.resnet50(pretrained=pretrained)
+        original_model = models.resnet34(pretrained=pretrained)
         self.features = nn.Sequential(*list(original_model.children())[:-2],
                                       nn.AdaptiveAvgPool2d(1), Flatten())
         self.classifier = nn.Linear(original_model.fc.in_features, n_class)

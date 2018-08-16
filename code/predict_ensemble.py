@@ -26,13 +26,13 @@ def main():
         assert fn1 == fn2
     submission_ensemble = pd.DataFrame(
         {
-            "filename|defect":
+            "filename":
             submission1.filename,
             "probability":
             (submission1.probability.values + submission2.probability.values) /
             2
         },
-        columns=["filename|defect", "probability"])
+        columns=["filename", "probability"])
 
     submission_ensemble.to_csv(
         f"../submit/submit_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",

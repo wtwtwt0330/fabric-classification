@@ -30,7 +30,7 @@ def main():
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    model = ResNetClassifier(n_class=11).to(device)
+    model = ResNetClassifier().to(device)
     crit = torch.nn.CrossEntropyLoss()
 
     # stage 1
