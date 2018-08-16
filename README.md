@@ -25,9 +25,9 @@
 
 ## 方案
 
-原始图像resize后用预训练模型训练。预测时做test time augmentation（1原始+4随机）。共使用两种模型：
+原始图像resize后用预训练模型训练。预测时做test time augmentation（1原始+4随机）。共使用两种模型：
 
-1. ResNet34
+1. ResNet34
 2. VGG16
 
 将结果ensemble后提交。
